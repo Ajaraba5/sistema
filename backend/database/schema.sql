@@ -34,7 +34,7 @@ CREATE TABLE lideres (
 CREATE TABLE personas (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(200) NOT NULL,
-    cedula VARCHAR(20) UNIQUE,
+    cedula VARCHAR(20) UNIQUE,  -- NULL allowed for voters without ID; multiple NULLs permitted
     telefono VARCHAR(20),
     direccion TEXT,
     zona VARCHAR(100),

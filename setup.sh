@@ -33,6 +33,12 @@ fi
 
 echo "✓ PostgreSQL client found"
 
+# Check if backend directory exists
+if [ ! -d "backend" ]; then
+    echo "❌ Backend directory not found. Please run this script from the project root."
+    exit 1
+fi
+
 # Install backend dependencies
 echo ""
 echo "Installing backend dependencies..."

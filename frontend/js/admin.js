@@ -512,8 +512,16 @@ async function deleteLider(id) {
     if (!confirm('¿Está seguro de eliminar este líder?')) return;
     
     try {
-        // Note: Backend doesn't have this endpoint yet, but keeping for consistency
-        alert('Función no implementada aún');
+        // First check if lider has associated personas
+        const personas = await apiRequest('/personas?lider_id=' + id);
+        if (personas.data && personas.data.length > 0) {
+            alert('No se puede eliminar este líder porque tiene personas asignadas. Por favor, reasigne las personas primero.');
+            return;
+        }
+        
+        // Note: This would require a DELETE endpoint in the backend
+        // For now, we'll show a message
+        alert('Para eliminar líderes, contacte al administrador del sistema. Esta función requiere implementación adicional en el backend.');
     } catch (error) {
         alert('Error al eliminar líder: ' + error.message);
     }
