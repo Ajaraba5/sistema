@@ -245,7 +245,7 @@ Ver `.env.example` para todas las opciones de configuración disponibles.
 - JWT (jsonwebtoken)
 - bcryptjs
 - pg (node-postgres)
-- XLSX
+- ExcelJS
 - Multer
 
 ### Frontend

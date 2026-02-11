@@ -1,42 +1,57 @@
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const Persona = require('../models/Persona');
 
 class ExcelService {
     // Import personas from Excel
     static async importExcel(fileBuffer) {
         try {
-            const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const data = XLSX.utils.sheet_to_json(worksheet);
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(fileBuffer);
+            
+            const worksheet = workbook.worksheets[0];
+            if (!worksheet) {
+                throw new Error('No worksheet found in Excel file');
+            }
 
             const results = {
                 success: 0,
                 errors: []
             };
 
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
+            // Skip header row (row 1) and start from row 2
+            worksheet.eachRow({ includeEmpty: false }, async (row, rowNumber) => {
+                if (rowNumber === 1) return; // Skip header
+                
                 try {
+                    const rowData = {
+                        nombre: row.getCell(1).value,
+                        cedula: row.getCell(2).value,
+                        telefono: row.getCell(3).value,
+                        direccion: row.getCell(4).value,
+                        zona: row.getCell(5).value,
+                        partido: row.getCell(6).value,
+                        lider_id: row.getCell(7).value || null,
+                        contador_id: row.getCell(8).value || null
+                    };
+
                     await Persona.create({
-                        nombre: row.nombre || row.Nombre,
-                        cedula: row.cedula || row.Cedula,
-                        telefono: row.telefono || row.Telefono,
-                        direccion: row.direccion || row.Direccion,
-                        zona: row.zona || row.Zona,
-                        partido: row.partido || row.Partido,
-                        lider_id: row.lider_id || row.Lider_ID || null,
-                        contador_id: row.contador_id || row.Contador_ID || null
+                        nombre: rowData.nombre,
+                        cedula: rowData.cedula,
+                        telefono: rowData.telefono,
+                        direccion: rowData.direccion,
+                        zona: rowData.zona,
+                        partido: rowData.partido,
+                        lider_id: rowData.lider_id,
+                        contador_id: rowData.contador_id
                     });
                     results.success++;
                 } catch (error) {
                     results.errors.push({
-                        row: i + 2, // Excel row number (1-indexed + header)
-                        data: row,
+                        row: rowNumber,
                         error: error.message
                     });
                 }
-            }
+            });
 
             return results;
         } catch (error) {
@@ -49,43 +64,58 @@ class ExcelService {
         try {
             const personas = await Persona.findAll();
 
-            const data = personas.map(p => ({
-                ID: p.id,
-                Nombre: p.nombre,
-                Cedula: p.cedula,
-                Telefono: p.telefono,
-                Direccion: p.direccion,
-                Zona: p.zona,
-                Partido: p.partido,
-                Lider: p.lider_nombre || '',
-                Contador: p.contador_nombre || '',
-                'Ha Votado': p.ha_votado ? 'Sí' : 'No',
-                'Fecha Voto': p.fecha_voto ? new Date(p.fecha_voto).toLocaleString() : '',
-                'Fecha Creación': new Date(p.created_at).toLocaleString()
-            }));
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'Sistema de Votación';
+            workbook.created = new Date();
+            
+            const worksheet = workbook.addWorksheet('Personas');
 
-            const worksheet = XLSX.utils.json_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Personas');
-
-            // Set column widths
-            const wscols = [
-                { wch: 5 },  // ID
-                { wch: 30 }, // Nombre
-                { wch: 15 }, // Cedula
-                { wch: 15 }, // Telefono
-                { wch: 30 }, // Direccion
-                { wch: 15 }, // Zona
-                { wch: 15 }, // Partido
-                { wch: 20 }, // Lider
-                { wch: 20 }, // Contador
-                { wch: 10 }, // Ha Votado
-                { wch: 20 }, // Fecha Voto
-                { wch: 20 }  // Fecha Creación
+            // Define columns
+            worksheet.columns = [
+                { header: 'ID', key: 'id', width: 10 },
+                { header: 'Nombre', key: 'nombre', width: 30 },
+                { header: 'Cédula', key: 'cedula', width: 15 },
+                { header: 'Teléfono', key: 'telefono', width: 15 },
+                { header: 'Dirección', key: 'direccion', width: 30 },
+                { header: 'Zona', key: 'zona', width: 15 },
+                { header: 'Partido', key: 'partido', width: 15 },
+                { header: 'Líder', key: 'lider', width: 20 },
+                { header: 'Contador', key: 'contador', width: 20 },
+                { header: 'Ha Votado', key: 'ha_votado', width: 12 },
+                { header: 'Fecha Voto', key: 'fecha_voto', width: 20 },
+                { header: 'Fecha Creación', key: 'created_at', width: 20 }
             ];
-            worksheet['!cols'] = wscols;
 
-            return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+            // Add rows
+            personas.forEach(p => {
+                worksheet.addRow({
+                    id: p.id,
+                    nombre: p.nombre,
+                    cedula: p.cedula || '',
+                    telefono: p.telefono || '',
+                    direccion: p.direccion || '',
+                    zona: p.zona || '',
+                    partido: p.partido || '',
+                    lider: p.lider_nombre || '',
+                    contador: p.contador_nombre || '',
+                    ha_votado: p.ha_votado ? 'Sí' : 'No',
+                    fecha_voto: p.fecha_voto ? new Date(p.fecha_voto).toLocaleString() : '',
+                    created_at: new Date(p.created_at).toLocaleString()
+                });
+            });
+
+            // Style header row
+            worksheet.getRow(1).font = { bold: true };
+            worksheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF2563EB' }
+            };
+            worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+            // Generate buffer
+            const buffer = await workbook.xlsx.writeBuffer();
+            return buffer;
         } catch (error) {
             throw new Error(`Error exporting Excel: ${error.message}`);
         }
