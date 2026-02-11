@@ -74,7 +74,7 @@ CREATE INDEX idx_audit_created ON audit_log(created_at);
 -- Insert default admin user (password: admin123)
 -- Hash generated with bcryptjs for 'admin123'
 INSERT INTO users (username, password, role, nombre, email) 
-VALUES ('admin', '$2a$10$rGz3qZ3qZ3qZ3qZ3qZ3qZOYxV8xV8xV8xV8xV8xV8xV8xV8xV8xV8', 'admin', 'Administrador Principal', 'admin@sistema.com');
+VALUES ('admin', '$2a$10$gMhMqaBuM5gcUxjLfNQ6zuocdI/xArL5oi0Vk4mYm2m/17zvkeBai', 'admin', 'Administrador Principal', 'admin@sistema.com');
 
 COMMENT ON TABLE users IS 'System users (admin and contador roles)';
 COMMENT ON TABLE lideres IS 'Political leaders managing voter groups';

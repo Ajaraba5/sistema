@@ -2,9 +2,8 @@ const ExcelService = require('../utils/excelService');
 const multer = require('multer');
 
 // Configure multer for file upload
-const storage = multer.memoryStorage();
 const upload = multer({ 
-    storage,
+    storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
         if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
