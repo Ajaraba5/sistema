@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Contador - Sistema de Votación</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/contador.css">
+</head>
+<body class="contador-page">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Panel de Contador</h1>
+            <div class="user-info">
+                <span id="userName">Contador</span>
+                <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Statistics Cards -->
+        <section class="stats-section">
+            <div class="stat-card">
+                <h3>Votantes Asignados</h3>
+                <div class="stat-value" id="totalAsignados">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Han Votado</h3>
+                <div class="stat-value" id="totalVotaron">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pendientes</h3>
+                <div class="stat-value" id="totalPendientes">0</div>
+            </div>
+        </section>
+
+        <!-- Progress Bar -->
+        <section class="progress-section">
+            <h3>Progreso de Votación</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p class="progress-text" id="progressText">0%</p>
+        </section>
+
+        <!-- Personas List -->
+        <section class="personas-section">
+            <div class="section-header">
+                <h2>Mis Votantes</h2>
+                <div class="search-box">
+                    <input type="text" id="searchPersonas" placeholder="Buscar votante...">
+                </div>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="voted">Han Votado</button>
+                <button class="filter-btn" data-filter="pending">Pendientes</button>
+            </div>
+
+            <div class="personas-list" id="personasList">
+                <div class="loading">Cargando votantes...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Vote Confirmation Modal -->
+    <div id="voteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Voto</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>¿Confirma que <strong id="voterName"></strong> ha votado?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelVoteBtn">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmVoteBtn">Confirmar Voto</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/contador.js"></script>
+</body>
+</html>
