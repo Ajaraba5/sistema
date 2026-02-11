@@ -1,0 +1,200 @@
+/* Contador Page Specific Styles */
+
+.progress-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.progress-section h3 {
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 30px;
+    background: var(--border-color);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 1rem;
+    color: white;
+    font-weight: 600;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Personas Section */
+.personas-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: var(--dark-color);
+}
+
+.search-box input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    min-width: 300px;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Filter Buttons */
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: white;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-color);
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Personas List */
+.personas-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.persona-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.persona-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.persona-card.voted {
+    background: #f0fdf4;
+    border-color: var(--success-color);
+}
+
+.persona-info h3 {
+    font-size: 1.125rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.persona-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+}
+
+.persona-detail {
+    display: flex;
+    align-items: center;
+}
+
+.persona-detail strong {
+    margin-right: 0.5rem;
+    color: var(--text-color);
+}
+
+.persona-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vote-status {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.vote-status.voted {
+    background: #d1fae5;
+    color: var(--success-color);
+}
+
+.vote-status.pending {
+    background: #fef3c7;
+    color: var(--warning-color);
+}
+
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .search-box input {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .persona-card {
+        grid-template-columns: 1fr;
+    }
+
+    .persona-details {
+        grid-template-columns: 1fr;
+    }
+
+    .persona-actions {
+        justify-content: flex-start;
+    }
+}

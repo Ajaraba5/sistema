@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo - Sistema de Votación</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="admin-page">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Panel Administrativo</h1>
+            <div class="user-info">
+                <span id="userName">Admin</span>
+                <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Statistics Cards -->
+        <section class="stats-section">
+            <div class="stat-card">
+                <h3>Total Votantes</h3>
+                <div class="stat-value" id="totalPersonas">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Han Votado</h3>
+                <div class="stat-value" id="totalVotaron">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pendientes</h3>
+                <div class="stat-value" id="totalPendientes">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Contadores</h3>
+                <div class="stat-value" id="totalContadores">0</div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Votación por Zona</h3>
+                <canvas id="zonaChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Votación por Partido</h3>
+                <canvas id="partidoChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Tabs -->
+        <section class="tabs-section">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="votantes">Votantes</button>
+                <button class="tab-btn" data-tab="contadores">Contadores</button>
+                <button class="tab-btn" data-tab="lideres">Líderes</button>
+                <button class="tab-btn" data-tab="excel">Excel</button>
+                <button class="tab-btn" data-tab="configuracion">Configuración</button>
+            </div>
+
+            <!-- Votantes Tab -->
+            <div id="votantes" class="tab-content active">
+                <div class="tab-header">
+                    <h2>Gestión de Votantes</h2>
+                    <button class="btn btn-primary" id="addPersonaBtn">Agregar Votante</button>
+                </div>
+                
+                <div class="filters">
+                    <input type="text" id="searchPersonas" placeholder="Buscar por nombre o cédula...">
+                    <select id="filterZona">
+                        <option value="">Todas las zonas</option>
+                    </select>
+                    <select id="filterPartido">
+                        <option value="">Todos los partidos</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="personasTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cédula</th>
+                                <th>Zona</th>
+                                <th>Partido</th>
+                                <th>Contador</th>
+                                <th>Votó</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="personasTableBody">
+                            <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Contadores Tab -->
+            <div id="contadores" class="tab-content">
+                <div class="tab-header">
+                    <h2>Gestión de Contadores</h2>
+                    <button class="btn btn-primary" id="addContadorBtn">Agregar Contador</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="contadoresTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Asignados</th>
+                                <th>Votaron</th>
+                                <th>Pendientes</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contadoresTableBody">
+                            <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lideres Tab -->
+            <div id="lideres" class="tab-content">
+                <div class="tab-header">
+                    <h2>Gestión de Líderes</h2>
+                    <button class="btn btn-primary" id="addLiderBtn">Agregar Líder</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="lideresTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Partido</th>
+                                <th>Zona</th>
+                                <th>Personas</th>
+                                <th>Votaron</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lideresTableBody">
+                            <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Excel Tab -->
+            <div id="excel" class="tab-content">
+                <div class="tab-header">
+                    <h2>Importar/Exportar Excel</h2>
+                </div>
+
+                <div class="excel-actions">
+                    <div class="excel-card">
+                        <h3>Importar Datos</h3>
+                        <p>Suba un archivo Excel con los datos de votantes</p>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;">
+                        <button class="btn btn-primary" id="importExcelBtn">Seleccionar Archivo</button>
+                        <div id="importResult" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="excel-card">
+                        <h3>Exportar Datos</h3>
+                        <p>Descargue todos los votantes en formato Excel</p>
+                        <button class="btn btn-success" id="exportExcelBtn">Descargar Excel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion Tab -->
+            <div id="configuracion" class="tab-content">
+                <div class="tab-header">
+                    <h2>Configuración del Sistema</h2>
+                </div>
+
+                <div class="config-section">
+                    <div class="danger-zone">
+                        <h3>Zona de Peligro</h3>
+                        <p>Reiniciar la base de datos eliminará TODOS los datos excepto el usuario admin.</p>
+                        <button class="btn btn-danger" id="resetDbBtn">Reiniciar Base de Datos</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="personaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="personaModalTitle">Agregar Votante</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="personaForm">
+                <input type="hidden" id="personaId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="personaNombre">Nombre *</label>
+                        <input type="text" id="personaNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="personaCedula">Cédula</label>
+                        <input type="text" id="personaCedula">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="personaTelefono">Teléfono</label>
+                        <input type="text" id="personaTelefono">
+                    </div>
+                    <div class="form-group">
+                        <label for="personaZona">Zona</label>
+                        <input type="text" id="personaZona">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="personaPartido">Partido</label>
+                        <input type="text" id="personaPartido">
+                    </div>
+                    <div class="form-group">
+                        <label for="personaContador">Contador</label>
+                        <select id="personaContador">
+                            <option value="">Sin asignar</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="personaDireccion">Dirección</label>
+                    <textarea id="personaDireccion" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelPersonaBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="contadorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agregar Contador</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="contadorForm">
+                <div class="form-group">
+                    <label for="contadorNombre">Nombre *</label>
+                    <input type="text" id="contadorNombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="contadorUsername">Usuario *</label>
+                    <input type="text" id="contadorUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="contadorPassword">Contraseña *</label>
+                    <input type="password" id="contadorPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="contadorEmail">Email</label>
+                    <input type="email" id="contadorEmail">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelContadorBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="liderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agregar Líder</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="liderForm">
+                <div class="form-group">
+                    <label for="liderNombre">Nombre *</label>
+                    <input type="text" id="liderNombre" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="liderPartido">Partido</label>
+                        <input type="text" id="liderPartido">
+                    </div>
+                    <div class="form-group">
+                        <label for="liderZona">Zona</label>
+                        <input type="text" id="liderZona">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="liderTelefono">Teléfono</label>
+                        <input type="text" id="liderTelefono">
+                    </div>
+                    <div class="form-group">
+                        <label for="liderEmail">Email</label>
+                        <input type="email" id="liderEmail">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelLiderBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
