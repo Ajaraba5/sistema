@@ -83,10 +83,18 @@ function renderPersonas() {
         return;
     }
     
-    container.innerHTML = filtered.map(p => `
+    container.innerHTML = filtered.map(p => {
+        // Properly escape HTML to prevent XSS
+        const escapedName = p.nombre.replace(/&/g, '&amp;')
+                                     .replace(/</g, '&lt;')
+                                     .replace(/>/g, '&gt;')
+                                     .replace(/"/g, '&quot;')
+                                     .replace(/'/g, '&#39;');
+        
+        return `
         <div class="persona-card ${p.ha_votado ? 'voted' : ''}">
             <div class="persona-info">
-                <h3>${p.nombre}</h3>
+                <h3>${escapedName}</h3>
                 <div class="persona-details">
                     ${p.cedula ? `<div class="persona-detail"><strong>Cédula:</strong> ${p.cedula}</div>` : ''}
                     ${p.telefono ? `<div class="persona-detail"><strong>Teléfono:</strong> ${p.telefono}</div>` : ''}
@@ -98,11 +106,12 @@ function renderPersonas() {
             <div class="persona-actions">
                 ${p.ha_votado 
                     ? `<div class="vote-status voted">✓ Votó</div>` 
-                    : `<button class="btn btn-success" onclick="openVoteModal(${p.id}, '${p.nombre.replace(/'/g, "\\'")}')">Marcar Voto</button>`
+                    : `<button class="btn btn-success" data-persona-id="${p.id}" data-persona-name="${escapedName}" class="vote-btn">Marcar Voto</button>`
                 }
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Event Listeners
@@ -122,6 +131,15 @@ function initEventListeners() {
     // Search
     document.getElementById('searchPersonas').addEventListener('input', () => {
         renderPersonas();
+    });
+    
+    // Vote buttons - use event delegation
+    document.getElementById('personasList').addEventListener('click', (e) => {
+        if (e.target.classList.contains('vote-btn')) {
+            const id = e.target.getAttribute('data-persona-id');
+            const name = e.target.getAttribute('data-persona-name');
+            openVoteModal(id, name);
+        }
     });
     
     // Vote modal
@@ -181,6 +199,5 @@ function refreshDashboard() {
     loadDashboard();
 }
 
-// Make functions global for onclick handlers
-window.openVoteModal = openVoteModal;
+// Make functions global only where needed (for socket events)
 window.refreshDashboard = refreshDashboard;
